@@ -1,0 +1,49 @@
+## Steps to follow while creating webAPI with CosmosDB
+
+1) You have Azure Account to create database.
+2) Create database as per your requirements.
+3) Create WebAPI project in .net core.
+4) Install required packages for CosmosDB -> Microsoft.Azure.Cosmos
+	from Nuget package manager or console also intall other required packages like NesoftJson, AutoMapper, Entity Framework
+5) Set database connection string in appsettings.json file like as given bellow
+
+"DBConnection": {
+  "AccountURL": "https://cosmosrgeastusa830071a-dba3-47e1-bca3db.documents.azure.com:443/",
+  "AuthKey": "ijkTWgjv7tLtGLrkNpacZnXQGMRQqmyqSvpIzEUx6AKCvPxKor69dBezSeSRr8qfIjkPWdLdrX03ACDbnNOrJg==",
+  "DatabaseName": "ProductManagement",
+  "ContainerName": "Product"
+}
+
+6) Create context file.
+7) Inject dependency in Program.cs file for database connection and context file, such as given bellow.
+
+ //Add DI Container for DBContext Configuration 
+builder.Services.Configure<DBConnection>(builder.Configuration.GetSection(nameof(DBConnection)));
+builder.Services.AddSingleton<IDbContext>(
+    sp=>sp.GetRequiredService<IOptions<DBConnection>>().Value);
+builder.Services.AddSingleton<CosmosClient>(sp => new CosmosClient(builder.Configuration.GetValue<string>("DBConnection:AccountURL"),
+                                        builder.Configuration.GetValue<string>("DBConnection:AuthKey")));
+
+8) Create DTO/DAO business objects as per your database tables.
+  public partial class Product
+{
+   
+    public string id { get; set; } 
+   
+    public string productName { get; set; }
+    
+    public string productDescription { get; set; }
+    
+    public int productCategory { get; set; }
+    
+    public decimal productPrice { get; set; }
+    public bool isActive { get; set; }  
+    public DateTime CreatedOn { get; set; }
+    public DateTime UpdatedOn { get; set;}
+    public string CreatedBy { get; set; }
+    public string UpdatedBy { get; set;}
+
+}
+
+9) Create services file for each DTO curd operation.
+10. Create controller for each DTO for curd operation.
